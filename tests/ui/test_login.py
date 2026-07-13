@@ -65,8 +65,8 @@ def test_multi_tenant_access_fixed(page: Page):
         expect(project_cards.nth(i)).to_contain_text("Company2")
 
 
-@pytest.mark.parametrize("browser_name", ["chromium", "firefox", "webkit"])
-def test_login_cross_browser_placeholder(browser_name):
+@pytest.mark.parametrize("target_browser", ["chromium", "firefox", "webkit"])
+def test_login_cross_browser_placeholder(target_browser):
     """
     Documents intent: run the full suite across browsers via
     `pytest --browser chromium --browser firefox --browser webkit`.
