@@ -84,3 +84,45 @@ workflowpro-qa-automation/
 * **Test environment stability:** Is staging a stable, dedicated QA environment, or does it get redeployed/reset on a schedule that could wipe test data mid-run?
 * **Role permission matrix:** Is there a documented list of exactly what each role (Admin/Manager/Employee) can and cannot see/do? Without this, permission tests are guesswork rather than verification against a spec.
 * **Retry policy:** Should genuinely non-deterministic failures auto-retry once in CI (pytest-rerunfailures), or should every failure be investigated manually with zero tolerance for retries masking real bugs?
+
+***
+
+# Part 3: API + UI Integration Test
+
+## Technical Decisions & Strategy
+
+1. **Hybrid Automation Approach (API Seed + UI Validate):**
+   The test leverages the `WorkFlowProAPIClient` to bypass the UI for project creation. This keeps the test execution fast, resilient, and focused only on validating the *read* behavior in the UI (dashboard rendering and tenant isolation) without wasting time crawling through creation forms.
+
+2. **Robust State Management (Test Data Cleanup):**
+   A critical requirement of scalable automation is preventing staging database bloat. The UI steps are wrapped in a `try/finally` block. This ensures that even if Playwright fails an assertion, `company1_api_client.delete_project(project_id)` execution is guaranteed to run.
+
+3. **Dynamic Viewport Emulation for Mobile Web:**
+   Instead of launching a separate heavy device emulator just to check a CSS media query breakpoint, the test dynamically adjusts Playwright's viewport (`page.set_viewport_size()`) mid-test.
+   *Note on BrowserStack:* If the product team confirms this is a **native** application (iOS/Android) rather than responsive mobile web, this emulation approach would be swapped for a Remote WebDriver pointing to BrowserStack's App Automate hub running Appium.
+
+4. **Security & Tenant Isolation Validation:**
+   The test explicitly logs out of Company 1 and logs into Company 2, using Playwright's `.not_to_be_visible()` assertion to strictly verify that Company 1's seeded project does not bleed into Company 2's DOM.
+
+5. **Graceful Network Degradation:**
+   API calls are wrapped in `try/except` targeting `requests.exceptions.RequestException`. If the API fails to seed data, `pytest.fail()` short-circuits the test with a clear context trace, preventing a confusing cascading failure in the UI layer.
+
+6. **Consistent Mocking Strategy:**
+   Both the API and UI network layers are mocked (via `page.route()` for Playwright, `unittest.mock` for the API client) so the full test is runnable end-to-end against the dummy domain in this assessment, rather than only the API layer being mocked while UI calls fail against a non-resolving host.
+
+7. **Request Contract Verification:**
+   Beyond confirming a response was returned, the test asserts on `mock_post.call_args` to verify the actual POST body matches the API spec given (`name`, `team_members`), so the mock validates the contract, not just the happy path.
+
+8. **Tenant-Scoped Fixture:**
+   Uses a dedicated `company1_api_client` fixture (defined in `conftest.py` for reuse across future integration tests) rather than the framework's generic parametrized `api_client` fixture, since this test's assertions are inherently company1-specific and would silently misbehave if auto-parametrized across tenants.
+
+9. **Explicit Route Teardown:**
+   Before switching the mocked `/dashboard` response from Company 1 to Company 2, the test calls `page.unroute("**/dashboard")` to explicitly remove the prior handler, rather than relying on Playwright's implicit last-registered-handler-wins behavior — making the tenant switch unambiguous to a reader.
+
+## Assumptions
+
+- This test targets a dummy/non-live domain; both API and UI network layers are fully mocked to make the test independently runnable without live staging infrastructure.
+- Mocked HTML responses include minimal inline JS (`onclick` navigation) purely to make button interactions trigger page transitions in this fully-mocked test environment — this is a testing artifact, not a claim about the real app's implementation, which presumably handles navigation via its own client-side routing or form submission.
+- Mobile validation here tests responsive CSS behavior via viewport resize, not true cross-device rendering; a real BrowserStack run would use `driver_factory.py`'s capability builder and a Remote WebDriver session — not implemented here due to no BrowserStack account access in this assessment.
+- Authentication tokens (`TEST_API_TOKEN`) are assumed to be injected via CI secrets, not generated within the test itself.
+- Test data cleanup assumes `delete_project` is idempotent and safe to call even if the UI portion of the test failed before reaching cleanup.

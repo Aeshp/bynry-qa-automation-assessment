@@ -28,6 +28,10 @@ def api_client(tenant_config):
     )
 
 
+@pytest.fixture
+def company1_api_client():
+    cfg = get_env_config("company1")
+    return WorkFlowProAPIClient(cfg["api_url"], cfg["tenant_id"], os.getenv("TEST_API_TOKEN"))
 def user_fixture(user_key: str):
     @pytest.fixture
     def _fixture():

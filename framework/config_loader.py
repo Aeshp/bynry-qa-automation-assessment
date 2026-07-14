@@ -2,6 +2,9 @@ import os
 import yaml
 from pathlib import Path
 from functools import lru_cache
+from dotenv import load_dotenv
+
+load_dotenv()
 
 CONFIG_DIR = Path(__file__).parent.parent / "config"
 

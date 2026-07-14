@@ -125,6 +125,9 @@ venv.bak/
 
 #QA
 QAtests.md
+QA_dummy_tests.py
+QA_dummy_tests.py
+
 
 # mkdocs documentation
 /site/
