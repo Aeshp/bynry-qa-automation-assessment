@@ -41,6 +41,7 @@ def test_end_to_end_project_lifecycle(
             "**/login",
             lambda route: route.fulfill(
                 status=200,
+                content_type="text/html",
                 body='<html><body>'
                      '<input id="email"/><input id="password"/>'
                      '<button id="login-btn" onclick="window.location.href=\'/dashboard\'">Login</button>'
@@ -51,6 +52,7 @@ def test_end_to_end_project_lifecycle(
         def handle_company1_dashboard(route):
             route.fulfill(
                 status=200,
+                content_type="text/html",
                 body=f'<html><body><div class="dashboard-content">'
                      f'<div class="welcome-message">Welcome</div>'
                      f'<div class="project-card">{project_name}</div>'
@@ -130,6 +132,7 @@ def test_end_to_end_project_lifecycle(
             "**/dashboard",
             lambda route: route.fulfill(
                 status=200,
+                content_type="text/html",
                 body='<html><body><div class="dashboard-content">'
                      '<div id="user-profile">Profile</div>'
                      '<button id="logout-btn" onclick="window.location.href=\'/login\'">Logout</button>'
