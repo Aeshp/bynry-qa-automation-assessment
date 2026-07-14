@@ -1,0 +1,21 @@
+environments:
+  company1:
+    base_url: "https://company1.workflowpro.com"
+    api_url: "https://api.workflowpro.com/v1"
+    tenant_id: "company1"
+    expected_load_ms: 2000
+
+  company2:
+    base_url: "https://company2.workflowpro.com"
+    api_url: "https://api.workflowpro.com/v1"
+    tenant_id: "company2"
+    expected_load_ms: 3500   # this tenant is documented as slower
+
+browsers:
+  - chromium
+  - firefox
+  - webkit
+
+viewports:
+  desktop: { width: 1280, height: 720 }
+  mobile: { width: 390, height: 844 }

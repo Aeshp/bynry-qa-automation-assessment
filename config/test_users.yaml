@@ -1,0 +1,18 @@
+users:
+  company1_admin:
+    role: admin
+    tenant: company1
+    email_env: TEST_C1_ADMIN_EMAIL
+    password_env: TEST_C1_ADMIN_PASSWORD
+
+  company1_manager:
+    role: manager
+    tenant: company1
+    email_env: TEST_C1_MANAGER_EMAIL
+    password_env: TEST_C1_MANAGER_PASSWORD
+
+  company2_employee:
+    role: employee
+    tenant: company2
+    email_env: TEST_C2_EMPLOYEE_EMAIL
+    password_env: TEST_C2_EMPLOYEE_PASSWORD

@@ -1,0 +1,23 @@
+name: QA Automation Suite
+on: [push, pull_request]
+jobs:
+  test:
+    runs-on: ubuntu-latest
+    strategy:
+      matrix:
+        browser: [chromium, firefox, webkit]
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-python@v5
+        with: { python-version: "3.11" }
+      - run: pip install -r requirements.txt
+      - run: playwright install --with-deps
+      - run: pytest tests/ --browser ${{ matrix.browser }} -n 2
+        env:
+          TEST_C1_ADMIN_EMAIL: ${{ secrets.TEST_C1_ADMIN_EMAIL }}
+          TEST_C1_ADMIN_PASSWORD: ${{ secrets.TEST_C1_ADMIN_PASSWORD }}
+      - uses: actions/upload-artifact@v4
+        if: always()
+        with:
+          name: test-reports-${{ matrix.browser }}
+          path: reports/
