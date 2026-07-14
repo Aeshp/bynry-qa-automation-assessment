@@ -66,7 +66,7 @@ Run tests using `pytest` (configured in `pytest.ini` to auto-generate HTML repor
 
 ## Project Structure
 ```text
-workflowpro-qa-automation/
+bynry-qa-automation-assessment/
 ├── CASE_STUDY_REPORT.md
 ├── README.md
 ├── TEST_PLAN.md

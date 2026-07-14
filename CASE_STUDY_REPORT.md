@@ -18,7 +18,7 @@
 ## 1. Framework Structure
 
 ```text
-workflowpro-qa-automation/
+bynry-qa-automation-assessment/
 ├── pytest.ini
 ├── requirements.txt
 ├── conftest.py
@@ -43,9 +43,7 @@ workflowpro-qa-automation/
 │   ├── api/                    # pytest + requests, no browser, fast and independent
 │   ├── mobile/                 # BrowserStack-driven
 │   └── integration/            # combines API + UI + mobile (Part 3)
-├── test_data/
-│   ├── fixtures.py
-│   └── project_payloads.json   # versioned separately from test logic
+
 ├── reports/                    # generated HTML reports, traces, screenshots, videos
 └── .github/workflows/ci.yml    # CI matrix across browsers
 ```
@@ -60,8 +58,8 @@ workflowpro-qa-automation/
 * **Environments:** environments.yaml maps each tenant (company1, company2, ...) to its base_url, api_url, tenant_id, and a tenant-specific expected_load_ms. Adding a new tenant is a YAML entry, not a code change. The per-tenant load time directly addresses the "different tenants have different loading times" requirement, instead of one blanket timeout applied everywhere.
 * **Browsers:** driven via pytest-playwright's --browser CLI flag, matrixed in CI across chromium/firefox/webkit as separate parallel jobs. Viewport sizes are set explicitly in conftest.py rather than relying on CI runner defaults, since default resolutions vary across runners and can silently change layout-dependent test outcomes.
 * **Mobile/BrowserStack:** capabilities (device, OS version, real vs virtual device) live in browserstack.yaml, kept separate from web browser config since mobile sessions are provisioned differently (BrowserStack hub vs local Playwright launch).
-* **Test data / credentials:** test_users.yaml maps role + tenant to environment variable names, never raw credentials. Actual secret values live in CI secrets (GitHub Actions secrets) or a local .env file that's gitignored — the repo itself never contains a working credential.
-* **API payloads:** stored as JSON under test_data/, versioned independently from test logic, so changing test data doesn't require touching test code.
+* **Test data / credentials:** Role and tenant test data lives in `config/test_users.yaml`, mapping each role/tenant combination to environment variable names, never raw credentials. Actual secret values live in CI secrets (GitHub Actions secrets) or a local .env file that's gitignored — the repo itself never contains a working credential. This is the primary test data artifact in the framework.
+* **API payloads:** Constructed inline within individual tests (e.g., the request body in test_end_to_end_project_lifecycle) rather than externalized to a separate payload file. A dedicated test_data/ JSON payload directory was considered but not implemented, since the current test surface doesn't yet require shared/reusable payload fixtures across multiple tests.
 
 ## 3. Design Rationale
 
