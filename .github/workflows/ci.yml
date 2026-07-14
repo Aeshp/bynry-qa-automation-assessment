@@ -14,8 +14,13 @@ jobs:
       - run: playwright install --with-deps
       - run: pytest tests/ --browser ${{ matrix.browser }} -n 2
         env:
-          TEST_C1_ADMIN_EMAIL: ${{ secrets.TEST_C1_ADMIN_EMAIL }}
-          TEST_C1_ADMIN_PASSWORD: ${{ secrets.TEST_C1_ADMIN_PASSWORD }}
+          TEST_C1_ADMIN_EMAIL: ${{ secrets.TEST_C1_ADMIN_EMAIL || 'admin@company1.com' }}
+          TEST_C1_ADMIN_PASSWORD: ${{ secrets.TEST_C1_ADMIN_PASSWORD || 'password123' }}
+          TEST_C1_MANAGER_EMAIL: ${{ secrets.TEST_C1_MANAGER_EMAIL || 'manager@company1.com' }}
+          TEST_C1_MANAGER_PASSWORD: ${{ secrets.TEST_C1_MANAGER_PASSWORD || 'password123' }}
+          TEST_C2_EMPLOYEE_EMAIL: ${{ secrets.TEST_C2_EMPLOYEE_EMAIL || 'employee@company2.com' }}
+          TEST_C2_EMPLOYEE_PASSWORD: ${{ secrets.TEST_C2_EMPLOYEE_PASSWORD || 'password123' }}
+          TEST_API_TOKEN: ${{ secrets.TEST_API_TOKEN || 'dummy_token' }}
       - uses: actions/upload-artifact@v4
         if: always()
         with:
