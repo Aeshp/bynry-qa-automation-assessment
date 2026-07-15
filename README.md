@@ -65,41 +65,46 @@ Run tests using `pytest` (configured in `pytest.ini` to auto-generate HTML repor
   `pytest tests/ --html=reports/report.html --self-contained-html` (Note: This is automatically appended by `pytest.ini` default flags)
 
 ## Project Structure
+
 ```text
 bynry-qa-automation-assessment/
-├── CASE_STUDY_REPORT.md
-├── README.md
-├── TEST_PLAN.md
-├── pytest.ini
-├── requirements.txt
-├── .env.example
-├── .env
+├── CASE_STUDY_REPORT.md (Design rationale and technical architecture)
+├── README.md (Project setup, tech stack, and execution guide)
+├── TEST_PLAN.md (Detailed test scope and execution strategy)
+├── pytest.ini (Pytest CLI defaults and custom markers)
+├── requirements.txt (Python package dependencies and versions)
+├── .env.example (Template for local environment credentials)
 ├── config/
-│   ├── environments.yaml
-│   └── test_users.yaml
+│   ├── environments.yaml (Tenant base URLs and expected load times)
+│   └── test_users.yaml (Maps roles and tenants to environment variables)
 ├── framework/
-│   ├── api_client.py
-│   ├── base_page.py
-│   ├── config_loader.py
-│   └── driver_factory.py
+│   ├── api_client.py (Shared requests session with tenant headers)
+│   ├── base_page.py (Shared page object behavior and common waits)
+│   ├── config_loader.py (Loads YAML configurations and environment variables)
+│   └── driver_factory.py (Browser setup and BrowserStack capability builder)
 ├── pages/
-│   └── login_page.py
+│   └── login_page.py (Page object handling UI login and OTP)
 ├── reports/
 │   └── (Generated HTML reports)
 └── tests/
     ├── api/
-    │   └── test_projects_api.py
+    │   └── test_projects_api.py (Validates API client tenant and authorization headers)
     ├── integration/
-    │   └── test_project_flow.py
+    │   └── test_project_flow.py (End-to-end API seeding and UI validation)
     ├── mobile/
-    │   └── test_mobile_dashboard.py
+    │   └── test_mobile_dashboard.py (Validates mobile layout via viewport dimensions)
     └── ui/
-        ├── test_login.py
-        └── test_project_creation.py
+        ├── test_login.py (Login/tenant isolation logic; two tests marked skip — see TEST_PLAN.md)
+        └── test_project_creation.py (Validates RBAC fixture injection for projects)
 ```
 
 ## Reports & Artifacts
-Test reports are automatically saved in the `reports/` directory. By default, `pytest` generates `reports/report.html`. To view a report, simply open the `.html` file in any web browser. Video recordings and traces are retained on failure (configured in `pytest.ini`).
+Test reports are automatically saved in the `reports/` directory. To view a report, open the `.html` file in any web browser. Video recordings and traces are retained on failure (configured in `pytest.ini`).
+
+This repository includes three primary execution reports to demonstrate the development lifecycle:
+*   **`ui_login_execution_report.html`**: Targeted UI debugging run (Part 1). Contains 5 tests demonstrating intentional Playwright timeouts and asynchronous DOM state failures.
+*   **`integration_flow_report.html`**: Isolated E2E run (Part 3). Contains 1 complete cross-platform test validating API seeding, UI visualization, mobile responsiveness, and strict tenant isolation.
+*   **`full_suite_execution_report.html`**: The final CI pipeline validation. Contains the complete test matrix (11 active, 2 skipped), proving the entire framework executes flawlessly together.
 
 ## Design Rationale
 For comprehensive design rationale, technical decisions, and architecture assumptions, please refer to [CASE_STUDY_REPORT.md](CASE_STUDY_REPORT.md).
